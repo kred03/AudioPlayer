@@ -1,0 +1,125 @@
+<Window x:Class="AudioPlayer.UI.SettingsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:behaviors="clr-namespace:AudioPlayer.UI.Behaviors"
+        Title="Настройки"
+        Width="660"
+        Height="520"
+        MinWidth="660"
+        MinHeight="500"
+        Background="{DynamicResource WindowBackgroundBrush}"
+        Foreground="{DynamicResource PrimaryTextBrush}"
+        FontFamily="Segoe UI"
+        ResizeMode="CanResize"
+        ShowInTaskbar="False"
+        WindowStartupLocation="CenterOwner">
+    <Grid Margin="24">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="16" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="12" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="12" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <TextBlock FontSize="22"
+                   FontWeight="SemiBold"
+                   Text="Настройки проигрывателя" />
+
+        <GroupBox Grid.Row="2" Header="Музыкальная библиотека">
+            <Grid Margin="12">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="8" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Grid.ColumnSpan="3"
+                           Foreground="{DynamicResource SecondaryTextBrush}"
+                           Text="Папка, которая автоматически загружается при запуске" />
+                <TextBox x:Name="DefaultFolderTextBox"
+                         Grid.Row="2"
+                         Margin="0,0,8,0"
+                         VerticalContentAlignment="Center" />
+                <Button Grid.Row="2"
+                        Grid.Column="1"
+                        Content="Обзор…"
+                        Click="OnBrowseClick" />
+                <Button Grid.Row="2"
+                        Grid.Column="2"
+                        Content="Очистить"
+                        Click="OnClearFolderClick" />
+            </Grid>
+        </GroupBox>
+
+        <GroupBox Grid.Row="4" Header="Звук">
+            <Grid Margin="12">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="55" />
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Margin="0,0,12,0"
+                           VerticalAlignment="Center"
+                           Text="Громкость" />
+                <Slider x:Name="VolumeSlider"
+                        Grid.Column="1"
+                        Height="32"
+                        Minimum="0"
+                        Maximum="100"
+                        IsMoveToPointEnabled="True"
+                        ValueChanged="OnVolumeChanged"
+                        behaviors:SliderDragBehavior.IsDirectDragEnabled="True" />
+                <TextBlock Grid.Column="2"
+                           Margin="12,0,0,0"
+                           HorizontalAlignment="Right"
+                           VerticalAlignment="Center"
+                           Text="{Binding ElementName=VolumeSlider, Path=Value, StringFormat={}{0:0}%}" />
+            </Grid>
+        </GroupBox>
+
+        <GroupBox Grid.Row="6" Header="Оформление">
+            <Grid Margin="12">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="200" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Margin="0,0,12,0"
+                           VerticalAlignment="Center"
+                           Text="Тема приложения" />
+                <ComboBox x:Name="ThemeComboBox"
+                          Grid.Column="1"
+                          SelectedValuePath="Tag"
+                          SelectionChanged="OnThemeSelectionChanged">
+                    <ComboBoxItem Content="Тёмная" Tag="Dark" />
+                    <ComboBoxItem Content="Светлая" Tag="Light" />
+                </ComboBox>
+            </Grid>
+        </GroupBox>
+
+        <StackPanel Grid.Row="8"
+                    Margin="0,20,0,0"
+                    HorizontalAlignment="Right"
+                    Orientation="Horizontal">
+            <Button MinWidth="100"
+                    Content="Отмена"
+                    IsCancel="True" />
+            <Button MinWidth="100"
+                    Content="Сохранить"
+                    IsDefault="True"
+                    Click="OnSaveClick" />
+        </StackPanel>
+    </Grid>
+</Window>

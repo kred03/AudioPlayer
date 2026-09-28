@@ -1,0 +1,262 @@
+<Window x:Class="AudioPlayer.UI.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:behaviors="clr-namespace:AudioPlayer.UI.Behaviors"
+        xmlns:models="clr-namespace:AudioPlayer.Core.Models;assembly=AudioPlayer.Core"
+        Title="AudioPlayer"
+        Width="1180"
+        Height="720"
+        MinWidth="900"
+        MinHeight="540"
+        Background="{DynamicResource WindowBackgroundBrush}"
+        Foreground="{DynamicResource PrimaryTextBrush}"
+        FontFamily="Segoe UI"
+        AllowDrop="True"
+        DragOver="OnDragOver"
+        Drop="OnDrop"
+        WindowStartupLocation="CenterScreen">
+    <Window.InputBindings>
+        <KeyBinding Key="O" Modifiers="Control" Command="{Binding OpenFilesCommand}" />
+        <KeyBinding Key="S" Modifiers="Control" Command="{Binding SavePlaylistCommand}" />
+        <KeyBinding Key="Space" Command="{Binding TogglePlayPauseCommand}" />
+        <KeyBinding Key="Delete" Command="{Binding RemoveSelectedCommand}" />
+    </Window.InputBindings>
+
+    <DockPanel>
+        <Menu DockPanel.Dock="Top">
+            <MenuItem Header="_Файл">
+                <MenuItem Header="Открыть файл…"
+                          Command="{Binding OpenFilesCommand}"
+                          InputGestureText="Ctrl+O" />
+                <MenuItem Header="Открыть папку…"
+                          Command="{Binding OpenFolderCommand}" />
+                <Separator />
+                <MenuItem Header="Настройки…" Click="OnSettingsClick" />
+                <Separator />
+                <MenuItem Header="Загрузить плейлист…"
+                          Command="{Binding LoadPlaylistCommand}" />
+                <MenuItem Header="Сохранить плейлист…"
+                          Command="{Binding SavePlaylistCommand}"
+                          InputGestureText="Ctrl+S" />
+                <Separator />
+                <MenuItem Header="Выход" Click="OnExitClick" />
+            </MenuItem>
+            <MenuItem Header="_Воспроизведение">
+                <MenuItem Header="Воспроизвести / пауза"
+                          Command="{Binding TogglePlayPauseCommand}"
+                          InputGestureText="Space" />
+                <MenuItem Header="Стоп" Command="{Binding StopCommand}" />
+                <Separator />
+                <MenuItem Header="Предыдущий трек" Command="{Binding PreviousCommand}" />
+                <MenuItem Header="Следующий трек" Command="{Binding NextCommand}" />
+                <Separator />
+                <MenuItem Header="Режим повтора">
+                    <MenuItem Header="Выключен"
+                              IsCheckable="True"
+                              IsChecked="{Binding IsRepeatOff, Mode=OneWay}"
+                              Command="{Binding DisableRepeatCommand}" />
+                    <MenuItem Header="Текущий трек"
+                              IsCheckable="True"
+                              IsChecked="{Binding IsRepeatOne, Mode=OneWay}"
+                              Command="{Binding RepeatOneCommand}" />
+                    <MenuItem Header="Весь плейлист"
+                              IsCheckable="True"
+                              IsChecked="{Binding IsRepeatAll, Mode=OneWay}"
+                              Command="{Binding RepeatAllCommand}" />
+                </MenuItem>
+                <MenuItem Header="Случайный порядок"
+                          IsCheckable="True"
+                          IsChecked="{Binding IsShuffleEnabled, Mode=OneWay}"
+                          Command="{Binding ToggleShuffleCommand}" />
+            </MenuItem>
+            <MenuItem Header="_Вид">
+                <MenuItem Header="Тема">
+                    <MenuItem Header="Тёмная"
+                              Tag="Dark"
+                              IsCheckable="True"
+                              IsChecked="{Binding IsDarkTheme, Mode=OneWay}"
+                              Click="OnThemeClick" />
+                    <MenuItem Header="Светлая"
+                              Tag="Light"
+                              IsCheckable="True"
+                              IsChecked="{Binding IsLightTheme, Mode=OneWay}"
+                              Click="OnThemeClick" />
+                </MenuItem>
+            </MenuItem>
+            <MenuItem Header="_Справка">
+                <MenuItem Header="О программе" Click="OnAboutClick" />
+            </MenuItem>
+        </Menu>
+
+        <Border DockPanel.Dock="Top"
+                Padding="2"
+                Background="{DynamicResource PanelBackgroundBrush}">
+            <StackPanel Orientation="Horizontal">
+                <Button Content="Файл"
+                        Command="{Binding OpenFilesCommand}"
+                        ToolTip="Открыть аудиофайл (Ctrl+O)" />
+                <Button Content="Папка"
+                        Command="{Binding OpenFolderCommand}"
+                        ToolTip="Открыть папку с аудио" />
+                <Separator Width="1"
+                           Margin="5,7"
+                           Background="{DynamicResource BorderBrush}" />
+                <Button Content="Загрузить"
+                        Command="{Binding LoadPlaylistCommand}"
+                        ToolTip="Загрузить плейлист JSON/M3U" />
+                <Button Content="Сохранить"
+                        Command="{Binding SavePlaylistCommand}"
+                        ToolTip="Сохранить плейлист (Ctrl+S)" />
+                <Separator Width="1"
+                           Margin="5,7"
+                           Background="{DynamicResource BorderBrush}" />
+                <Button Content="Удалить"
+                        Command="{Binding RemoveSelectedCommand}"
+                        ToolTip="Удалить выбранный трек (Delete)" />
+                <Button Content="Очистить" Command="{Binding ClearCommand}" />
+            </StackPanel>
+        </Border>
+
+        <StatusBar DockPanel.Dock="Bottom">
+            <StatusBarItem>
+                <TextBlock Text="{Binding StatusMessage}" />
+            </StatusBarItem>
+            <Separator />
+            <StatusBarItem>
+                <TextBlock Text="{Binding TrackCountText}" />
+            </StatusBarItem>
+        </StatusBar>
+
+        <Border DockPanel.Dock="Bottom"
+                Padding="14"
+                Background="{DynamicResource PanelBackgroundBrush}">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0" Orientation="Horizontal">
+                    <Button Content="Пред." Command="{Binding PreviousCommand}" />
+                    <Button Content="Пуск" Command="{Binding PlayCommand}" />
+                    <Button Content="Пауза" Command="{Binding PauseCommand}" />
+                    <Button Content="Стоп" Command="{Binding StopCommand}" />
+                    <Button Content="След." Command="{Binding NextCommand}" />
+                </StackPanel>
+
+                <Slider Grid.Column="1"
+                        Margin="16,0"
+                        Height="32"
+                        VerticalAlignment="Center"
+                        Minimum="0"
+                        Maximum="{Binding DurationSeconds}"
+                        IsMoveToPointEnabled="True"
+                        behaviors:SliderDragBehavior.IsDirectDragEnabled="True"
+                        Value="{Binding PositionSeconds, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+
+                <TextBlock Grid.Column="2"
+                           VerticalAlignment="Center"
+                           Text="{Binding PlaybackTimeText}" />
+
+                <StackPanel Grid.Row="1"
+                            Grid.Column="0"
+                            Grid.ColumnSpan="3"
+                            Margin="4,10,4,0"
+                            Orientation="Horizontal"
+                            HorizontalAlignment="Right">
+                    <ComboBox Width="170"
+                              Margin="4"
+                              VerticalAlignment="Center"
+                              SelectedValuePath="Tag"
+                              SelectedValue="{Binding RepeatMode, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                        <ComboBoxItem Content="Повтор: выключен"
+                                      Tag="{x:Static models:RepeatMode.Off}" />
+                        <ComboBoxItem Content="Повтор: текущий трек"
+                                      Tag="{x:Static models:RepeatMode.One}" />
+                        <ComboBoxItem Content="Повтор: весь плейлист"
+                                      Tag="{x:Static models:RepeatMode.All}" />
+                    </ComboBox>
+                    <Button Content="{Binding ShuffleButtonText}"
+                            Command="{Binding ToggleShuffleCommand}"
+                            MinWidth="140" />
+                    <TextBlock Margin="18,0,8,0"
+                               VerticalAlignment="Center"
+                               Text="{Binding VolumeText}" />
+                    <Slider Width="150"
+                            Height="32"
+                            Minimum="0"
+                            Maximum="100"
+                            IsMoveToPointEnabled="True"
+                            behaviors:SliderDragBehavior.IsDirectDragEnabled="True"
+                            Value="{Binding VolumePercent, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                    <Button Content="{Binding MuteButtonText}"
+                            Command="{Binding ToggleMuteCommand}" />
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <Grid Margin="18">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="290" />
+                <ColumnDefinition Width="18" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <Border Grid.Column="0"
+                    Padding="18"
+                    Background="{DynamicResource PanelBackgroundBrush}"
+                    CornerRadius="8">
+                <StackPanel>
+                    <Border Height="254"
+                            Background="{DynamicResource ControlBackgroundBrush}"
+                            CornerRadius="6">
+                        <Grid>
+                            <Viewbox Margin="62">
+                                <TextBlock Foreground="{DynamicResource SecondaryTextBrush}"
+                                           Text="♫" />
+                            </Viewbox>
+                            <Image Source="{Binding CurrentCoverImage}"
+                                   Stretch="UniformToFill" />
+                        </Grid>
+                    </Border>
+                    <TextBlock Margin="0,18,0,4"
+                               FontSize="21"
+                               FontWeight="SemiBold"
+                               TextWrapping="Wrap"
+                               Text="{Binding CurrentTitle}" />
+                    <TextBlock Foreground="{DynamicResource SecondaryTextBrush}"
+                               TextWrapping="Wrap"
+                               Text="{Binding CurrentSubtitle}" />
+                    <TextBlock Margin="0,7,0,0"
+                               Foreground="{DynamicResource SecondaryTextBrush}"
+                               Text="{Binding CurrentMetadataDetails}" />
+                </StackPanel>
+            </Border>
+
+            <DataGrid Grid.Column="2"
+                      ItemsSource="{Binding Tracks}"
+                      SelectedItem="{Binding SelectedTrack}"
+                      AutoGenerateColumns="False"
+                      CanUserAddRows="False"
+                      IsReadOnly="True"
+                      SelectionMode="Single"
+                      AlternationCount="2"
+                      MouseDoubleClick="OnPlaylistDoubleClick"
+                      HeadersVisibility="Column">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Width="2*" Header="Название" Binding="{Binding DisplayTitle}" />
+                    <DataGridTextColumn Width="*" Header="Исполнитель" Binding="{Binding Artist}" />
+                    <DataGridTextColumn Width="*" Header="Альбом" Binding="{Binding Album}" />
+                    <DataGridTextColumn Width="70" Header="Год" Binding="{Binding YearText}" />
+                    <DataGridTextColumn Width="100" Header="Жанр" Binding="{Binding Genre}" />
+                    <DataGridTextColumn Width="105" Header="Длительность" Binding="{Binding DurationText}" />
+                </DataGrid.Columns>
+            </DataGrid>
+        </Grid>
+    </DockPanel>
+</Window>

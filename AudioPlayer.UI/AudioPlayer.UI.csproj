@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <UseWPF>true</UseWPF>
+    <AssemblyName>AudioPlayer</AssemblyName>
+    <RootNamespace>AudioPlayer.UI</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\AudioPlayer.Core\AudioPlayer.Core.csproj" />
+    <ProjectReference Include="..\AudioPlayer.Infrastructure\AudioPlayer.Infrastructure.csproj" />
+  </ItemGroup>
+</Project>
